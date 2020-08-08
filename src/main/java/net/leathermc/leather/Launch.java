@@ -4,31 +4,30 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import joptsimple.OptionParser;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 public class Launch implements ITweaker {
-	private static String[] args;
+	private List<String> args;
 
 	@SneakyThrows
 	@Override
 	public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
-		val a = new ArrayList<String>(args);
+		this.args = new ArrayList<>(args);
+		this.args.add("--version");
+		this.args.add(GProps.getName() + "-" + GProps.getVersion());
 
-		Launch.args = new String[a.size()];
-		a.add("--version");
-		a.add(GProps.getName() + "-" + GProps.getVersion());
-		Launch.args = a.toArray(Launch.args);
+		val parser = new OptionParser();
+		parser.allowsUnrecognizedOptions();
+		val nonOption = parser.nonOptions();
+		val options = parser.parse(String.valueOf(args));
 
-		System.out.println("\nConverted args:");
-		for (int i = 0; i < Launch.args.length; i++) {
-			System.out.println(Launch.args[i]);
-		}
-		System.out.println("\nOld args:");
-		for (String arg : a) {
-			System.out.println(arg);
+		System.out.println("\nArguments:");
+		for (String s : this.args) {
+			System.out.println(s);
 		}
 	}
 
@@ -44,6 +43,6 @@ public class Launch implements ITweaker {
 
 	@Override
 	public String[] getLaunchArguments() {
-		return args;
+		return this.args.toArray(new String[this.args.size()]);
 	}
 }
