@@ -3,9 +3,14 @@ plugins {
     id 'java-gradle-plugin'
 }
 
-group project.group
-version project.version
-archivesBaseName = project.name
+def props = new Properties()
+file('src/gradle.properties').withInputStream {
+    props.load(it)
+}
+
+group = props.getProperty("group")
+archivesBaseName = props.getProperty("name")
+version = props.getProperty("version")
 
 def lombok = 'org.projectlombok:lombok:1.18.12'
 
@@ -29,4 +34,30 @@ dependencies {
     annotationProcessor lombok
     testCompileOnly lombok
     testAnnotationProcessor lombok
+}
+
+// Generate Sources
+task genSources {
+    doFirst {
+        // Gradle Properties
+        def f = file('build/generated/net/leathermc/leather/GProps.java')
+        f.parentFile.mkdirs()
+        f.write """package net.leathermc.leather;
+
+import lombok.Getter;
+
+public class GProps {
+    @Getter
+    private static final String version = "$version";
+    @Getter
+    private static final String name = "$archivesBaseName";
+    @Getter
+    private static final String group = "$group";
+}
+"""
+    }
+}
+compileJava.dependsOn genSources
+sourceSets.main.java {
+    srcDir 'build/generated'
 }
