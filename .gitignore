@@ -1,7 +1,3 @@
-# ide stuff
-.idea/workspace.xml
-.idea/shelf/
-
 # build stuff
 gradle/
 gradle/wrapper/
