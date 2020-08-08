@@ -8,9 +8,9 @@ file('src/gradle.properties').withInputStream {
     props.load(it)
 }
 
-group = props.getProperty("group")
-archivesBaseName = props.getProperty("name")
-version = props.getProperty("version")
+group = props.getProperty "group"
+version = props.getProperty "version"
+archivesBaseName = props.getProperty "name"
 
 def lombok = 'org.projectlombok:lombok:1.18.12'
 
