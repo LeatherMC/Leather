@@ -1,10 +1,12 @@
 # ide stuff
-.idea/*
+.idea/workspace.xml
+.idea/shelf/
 
 # build stuff
-gradle
-gradle/wrapper
-.gradle
+gradle/
+gradle/wrapper/
+.gradle/
+build/
 
 # weird operating system things
 .DS_Store
