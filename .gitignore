@@ -1,5 +1,10 @@
 # ide stuff
 .idea/*
 
+# build stuff
+gradle
+gradle/wrapper
+.gradle
+
 # weird operating system things
 .DS_Store
