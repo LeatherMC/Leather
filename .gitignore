@@ -1,1 +1,5 @@
+# ide stuff
 .idea/*
+
+# weird operating system things
+.DS_Store
