@@ -1,2 +1,2 @@
 # Leather
-A modern, fast, and open-source mod loader for Minecraft Java Edition
+A modern, fast, mostly version independent, and open-source mod loader for Minecraft Java Edition
