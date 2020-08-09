@@ -1,11 +1,16 @@
 package net.leathermc.leather;
 
+import com.google.gson.Gson;
 import joptsimple.OptionParser;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 
 public class Launch {
 	@SneakyThrows
@@ -18,6 +23,56 @@ public class Launch {
 		val options = parser.parse(args);
 		val gameDir = (File)options.valueOf(gameDirOpt);
 
+		// Load Mods
+		val gameDirList = gameDir.listFiles();
+		if (gameDirList != null) {
+			for (File file : gameDirList) {
+				if (file.isDirectory() && file.getName().equals("mods")) {
+					val modsList = file.listFiles();
+					if (modsList != null) {
+						for (File modFile : modsList) {
+							if (modFile.getName().endsWith(".jar") && modFile.isFile()) {
+								val url = modFile.toURI().toURL();
+
+								// Load mod jar
+								val cl = (URLClassLoader)ClassLoader.getSystemClassLoader();
+								val urlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+								urlMethod.setAccessible(true);
+								urlMethod.invoke(cl, url);
+								System.out.println(url);
+
+								val ucl = new URLClassLoader(new URL[]{url});
+								//  read config file
+								val modConfig = ucl.getResourceAsStream("leather.mod.json");
+								if (modConfig != null) {
+									String configText = IOUtils.toString(modConfig, Charset.defaultCharset());
+
+									//  parse config file
+									val config = new Gson().fromJson(configText, ModConfig.class);
+
+									//  load mod
+									try {
+										val modInit = (ModInitializer)ucl.loadClass(config.getMainClass()).newInstance();
+										modInit.onInitialize();
+										// TODO: Set up server-side and client-side initializers
+									} catch (Exception e) {
+										if (e.getClass() == ClassNotFoundException.class) {
+											throw new ClassNotFoundException("Could not find mod initializer class: " + config.getMainClass());
+										}
+										throw e;
+									}
+									val mod = Mod.builder().enabled(true).id(config.getId()).name(config.getName()).description(config.getDescription()).perms(0).build();
+									System.out.println(mod.getId());
+									System.out.println(mod.getName());
+									System.out.println(mod.getDescription());
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		// Load Minecraft
 		//  Get class loader
 		val loader = ClassLoader.getSystemClassLoader();
@@ -29,22 +84,5 @@ public class Launch {
 		method.setAccessible(true);
 		//  Invoke main method
 		method.invoke(null, (Object) args);
-
-		// Load Mods
-		val gameDirList = gameDir.listFiles();
-		if (gameDirList != null) {
-			for (File file : gameDirList) {
-				if (file.isDirectory() && file.getName().equals("mods")) {
-					val modsList = file.listFiles();
-					if (modsList != null) {
-						for (File modFile : modsList) {
-							if (modFile.getName().endsWith(".jar") && modFile.isFile()) {
-								//Mod.builder().enabled(true).id(/* mod id */).name(/* mod name */).perms(0).build();
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }

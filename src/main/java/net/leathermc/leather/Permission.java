@@ -2,7 +2,6 @@ package net.leathermc.leather;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 // TODO: Permissions
 @Builder

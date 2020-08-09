@@ -4,7 +4,7 @@ plugins {
 }
 
 def props = new Properties()
-file('src/gradle.properties').withInputStream {
+file('gradle.properties').withInputStream {
     props.load(it)
 }
 
@@ -27,6 +27,8 @@ dependencies {
 
     implementation 'org.apache.logging.log4j:log4j-core:2.13.3'
     implementation 'net.sf.jopt-simple:jopt-simple:6.0-alpha-3'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'commons-io:commons-io:2.7'
 
     implementation 'net.minecraft:launchwrapper:1.3'
 

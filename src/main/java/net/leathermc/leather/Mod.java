@@ -11,6 +11,8 @@ public class Mod {
 	@Getter
 	private final String id;
 	@Getter
+	private final String description;
+	@Getter
 	private final long perms;
 	@Getter @Setter @Builder.Default
 	private boolean enabled = true;
