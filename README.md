@@ -1,5 +1,6 @@
 # Leather
-A modern, fast, mostly version independent, and open-source mod loader for Minecraft Java Edition
+A modern, fast, mostly version independent, and open-source mod loader for Minecraft Java Edition.
+**Note**: Leather uses some of Fabric's tools (for now).
 
 # Installation
 ## Manual
