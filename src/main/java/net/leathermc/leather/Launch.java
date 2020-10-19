@@ -26,8 +26,7 @@ public class Launch {
 		val gameDir = (File)options.valueOf(gameDirOpt);
 
 		// Load Mods
-		// O(n^(2 + x))
-		// TODO: Figure out x
+		// O(n^2)
 		val gameDirList = gameDir.listFiles();
 		if (gameDirList != null) {
 			for (File file : gameDirList) {
