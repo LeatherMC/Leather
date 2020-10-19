@@ -1,7 +1,6 @@
 package net.leathermc.leather;
 
 import com.jsoniter.JsonIterator;
-import com.jsoniter.output.JsonStream;
 import joptsimple.OptionParser;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -59,7 +58,7 @@ public class Launch {
 									try {
 										switch (config.getFormatVersion()) {
 											// TODO: Before release, move format version 4096 to 0
-											case 0:
+											//case 0:
 											// Format version 4096 is for pre-release formats
 											// DO NOT use this format in production!
 											case 4096: {
