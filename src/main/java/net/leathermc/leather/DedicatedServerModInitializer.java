@@ -1,5 +1,5 @@
 package net.leathermc.leather;
 
-public interface DedicatedServerInitializer {
+public interface DedicatedServerModInitializer {
 	void onInitialize();
 }
