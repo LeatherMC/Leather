@@ -1,6 +1,7 @@
 package net.leathermc.leather;
 
-import com.google.gson.Gson;
+import com.jsoniter.JsonIterator;
+import com.jsoniter.output.JsonStream;
 import joptsimple.OptionParser;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -13,6 +14,8 @@ import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 
 public class Launch {
+	private static final int configFormatVersion = 0;
+
 	@SneakyThrows
 	public static void main(String[] args) {
 		// Handle args
@@ -25,7 +28,7 @@ public class Launch {
 
 		// Load Mods
 		// O(n^(2 + x))
-		// todo: figure out x
+		// TODO: Figure out x
 		val gameDirList = gameDir.listFiles();
 		if (gameDirList != null) {
 			for (File file : gameDirList) {
@@ -46,24 +49,40 @@ public class Launch {
 								val ucl = new URLClassLoader(new URL[]{url});
 								//  read config file
 								val modConfig = ucl.getResourceAsStream("leather.mod.json");
+								Mod mod;
 								if (modConfig != null) {
 									String configText = IOUtils.toString(modConfig, Charset.defaultCharset());
 
 									//  parse config file
-									val config = new Gson().fromJson(configText, ModConfig.class);
+									val config = JsonIterator.deserialize(configText, ModConfig.class);
 
-									//  load mod
 									try {
-										val modInit = (ModInitializer)ucl.loadClass(config.getMainClass()).newInstance();
-										modInit.onInitialize();
-										// TODO: Set up server-side and client-side initializers
+										switch (config.getFormatVersion()) {
+											// TODO: Before release, move format version 4096 to 0
+											case 0:
+											// Format version 4096 is for pre-release formats
+											// DO NOT use this format in production!
+											case 4096: {
+												// load mod
+												val modInit = (ModInitializer)ucl.loadClass(config.getMain().getBoth()).newInstance();
+												modInit.onInitialize();
+												// TODO: Set up server-side and client-side initializers
+												mod = Mod.builder().enabled(true).id(config.getId()).name(config.getName()).description(config.getDescription()).perms(0).build();
+												break;
+											}
+											default: {
+												throw new RuntimeException("Format version \"" + configFormatVersion + "\" is not supported.");
+											}
+										}
 									} catch (Exception e) {
 										if (e.getClass() == ClassNotFoundException.class) {
-											throw new ClassNotFoundException("Could not find mod initializer class: " + config.getMainClass());
+											// TODO: Print correct class
+											throw new ClassNotFoundException("Could not find mod initializer class: " + config.getMain().getBoth());
 										}
 										throw e;
 									}
-									val mod = Mod.builder().enabled(true).id(config.getId()).name(config.getName()).description(config.getDescription()).perms(0).build();
+
+									System.out.println(config.getFormatVersion());
 									System.out.println(mod.getId());
 									System.out.println(mod.getName());
 									System.out.println(mod.getDescription());
